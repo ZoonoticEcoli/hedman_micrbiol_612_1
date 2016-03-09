@@ -1,0 +1,56 @@
+---
+title: "MICRBIOL_612.1"
+author: "Hayden Hedman"
+date: "March 9, 2016"
+output: html_document
+---
+
+### Assignment Description
+Your assignment is to create an html document where you analyze the gap minder data to answer a specific question you had about the data. The document should include a paragraph with R code embedded in the paragraph and the document should also include a figure that fits with the question you were interested in. You should upload the Rmd, html, and any other files to your github account. When it is complete, please send me an email with a link to your repository. This will be due March 18th.
+
+#### Load Packages
+```{r, echo=FALSE}
+require(dplyr)
+require(ggplot2)
+```
+
+#### Load Data
+```{r, echo=FALSE}
+#### Load Data
+g <- read.csv("gapminder-FiveYearData.csv", header=T)
+```
+
+#### Subset/Sub-group  Data
+```{r,}
+## Create variable identifier per region
+g$id <- id(g[c("continent", "year")], drop = TRUE)
+
+## Subset data by continent
+cont <- data.frame(group_by(g, id, continent, year) %>% 
+  summarize(pop_avg = mean(pop),
+            avg_life_exp = mean(lifeExp),
+            avg_gdp = mean(gdpPercap)))
+
+## subset continents
+afr <- subset(cont, continent=="Africa")
+eu <- subset(cont, continent=="Europe")
+as <- subset(cont, continent=="Asia")
+as <- subset(cont, continent=="Americas")
+oc <- subset(cont, continent=="Oceania")
+```
+
+### Question:
+#### How do average life expectancies vary at the continental regional level from 1952-2007?
+
+#### From the figure below it is evident that Oceania yields the highest average life expectancy. It is also evident that overall all of these regions yield unique positive slopes. It is interesting that there is a sudden drop in African average life expectancy in the late 1980s-1990s this is likely because of HIV/AIDS. In 2007, the max values for each region all significantly suprass the average lifeextancy in other regions ([Africa=`r max(afr$avg_life_exp)`]; [Americas=`r max(afr$avg_life_exp)`]; [Asia=`r max(g$continent=="Asia")`]; [Europe=`r max(cont$continent=="Europe")`]; and [Oceania=`r max(cont$continent=="Oceania")`]). I found the `package(dly)` very useful because it allowed me to organize and simplify the gapminder (i.e. original total dimensions: [$`r dim(g)`$] to subgrouped  dimensions [$`r dim(cont)`$]).  
+ 
+```{r, echo=FALSE}
+
+cont_plot <- ggplot(cont, aes(x = year, y = avg_life_exp)) + geom_point()+theme_bw() + labs (title = "Avg. Life Expectancy", x = 'Time', y = "Average Life Expectancy") + facet_wrap(~continent)
+print(cont_plot)
+
+```
+
+
+
+
